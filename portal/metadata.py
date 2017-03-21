@@ -20,7 +20,7 @@ class metadata (object):
         self.metaDataXML = inXML
         self.isTemp = isTemp
         self.title = None
-        self.descript = None
+        self.description = None
         self.purpose = None
         self.credits = None
         self.contacts = None
@@ -58,8 +58,8 @@ class metadata (object):
         else: self.title = ''
 
         titleNode = root.find(".//idAbs")
-        if titleNode <> None: self.descript = self._csvComp( titleNode.text )
-        else: self.descript = ''
+        if titleNode <> None: self.description = self._csvComp( titleNode.text )
+        else: self.description = ''
 
         titleNode = root.find(".//idPurp")
         if titleNode <> None: self.purpose = self._csvComp( titleNode.text )
@@ -102,5 +102,5 @@ class metadata (object):
             self.MaintFreq = ''
 
         if self.isTemp:
-            os.remove( self.self.metaDataXML )
+            os.remove( self.metaDataXML )
 

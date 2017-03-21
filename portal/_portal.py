@@ -44,11 +44,11 @@ def additem(user, token, portalUrl, url, title, summary="", description="",
     requestUrl = portalUrl +'/sharing/rest/content/users/'+ user +'/addItem'
     params = urllib.urlencode({
         'token' : token, 'f': 'json',
-        'URL': url, 'title': title,
-        'snippet': summary[:250],
-        'description': description,
-        'type': dtype, 'tags': tags,
-        'accessInformation': author,
+        'URL': url, 'title': title.encode('utf-8').strip(),
+        'snippet': summary[:250].encode('utf-8').strip(),
+        'description': description.encode('utf-8').strip(),
+        'type': dtype, 'tags': tags.encode('utf-8').strip(),
+        'accessInformation': author.encode('utf-8').strip(),
         "access": "public"
     }).encode()
 
@@ -62,11 +62,11 @@ def updateItem(user, token, portalUrl, itemID, url=None, title=None, summary=Non
     context = ssl._create_unverified_context() if NOSSL else None
     data = {'token' : token,'f' : 'json', "access": "public"}
     if url: data["URL"] = url
-    if title: data["title"] = title
-    if summary: data["snippet"] = summary[:250],
-    if description: data["description"] = description
-    if tags: data["tags"] = tags
-    if author: data["accessInformation"] = author
+    if title: data["title"] = title.encode('utf-8').strip()
+    if summary: data["snippet"] = summary[:250].encode('utf-8').strip(),
+    if description: data["description"] = description.encode('utf-8').strip()
+    if tags: data["tags"] = tags.encode('utf-8').strip()
+    if author: data["accessInformation"] = author.encode('utf-8').strip()
 
     requestUrl = portalUrl +'/sharing/rest/content/users/'+ user +'/items/' + itemID + "/update"
     params = urllib.urlencode(data).encode()
@@ -79,12 +79,11 @@ def shareItem(itemId, token, portalUrl, everyone=True, organistion=True, groups=
     context = ssl._create_unverified_context() if NOSSL else None
     public = 'true' if everyone else 'false'
     org = 'true' if organistion else 'false'
-    
+
     params = urllib.urlencode({'token' : token, 'f' : 'json', 'org': org,
-                               'everyone': public, 'groups': ",".join(groups) }).encode()
-    
+                               'everyone': public, 'groups': ",".join(groups).encode('utf-8').strip() }).encode()
+
     requestUrl = portalUrl +'/sharing/content/items/'+ itemId + '/share'
     request = Request(requestUrl, params)
     item = json.load( urlopen(request, context=context) )
     return item
-    
