@@ -38,8 +38,9 @@ def getItemInfo(itemId, token, portalUrl):
     return itemInfo
 
 def additem(user, token, portalUrl, url, title, summary="", description="",
-                  dtype="Map Service", tags="web", author="Stad Antwerpen"):
-    '''POST a new item to the portal: https://devas1179.dev.digant.antwerpen.local/arcgis/portalhelp/apidocs/rest/index.html?groupsearch.html#/Add_Item/02t600000022000000/'''
+                             dtype="Map Service", tags="web", author="Stad Antwerpen"):
+    '''POST a new item to the portal:
+        <PORTAL>/arcgis/portalhelp/apidocs/rest/index.html?groupsearch.html#/Add_Item/02t600000022000000/'''
     context = ssl._create_unverified_context() if NOSSL else None
     requestUrl = portalUrl +'/sharing/rest/content/users/'+ user +'/addItem'
     params = urllib.urlencode({
@@ -69,8 +70,7 @@ def updateItem(user, token, portalUrl, itemID, url=None, title=None, summary=Non
     if author: data["accessInformation"] = author.encode('utf-8').strip()
 
     requestUrl = portalUrl +'/sharing/rest/content/users/'+ user +'/items/' + itemID + "/update"
-    params = urllib.urlencode(data).encode()
-    request = Request(requestUrl, params)
+    request = Request(requestUrl, urllib.urlencode(data).encode())
     item = json.load( urlopen(request, context=context) )
     return item
 
