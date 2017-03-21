@@ -9,20 +9,28 @@
 # Created:     20/03/2017
 # Copyright:   (c) Kay Warrie 2017
 # Licence:     MIT
+#
 # usage: metadata2portal.py [-h] [--portal PORTAL] [--user USER] [--mxd MXD] 
 #                                [--password PASSWORD] [--service SERVICE]
 #
 # optional arguments:
-# -h                   show this help message and exit
-# --portal PORTAL      the link to the ESRI argis Portal
-# --user USER          the username of the ESRI argis Portal
-# --password PASSWORD  the password of the ESRI argis Portal
-# --mxd MXD            the mxd with sync with the ESRI argis Portal
-# --service SERVICE    the link to !CORRESPONDING! mapservice of the mxd
+#       -h                   show this help message and exit
+#       --portal PORTAL      the link to the ESRI argis Portal
+#       --user USER          the username of the ESRI argis Portal
+#       --password PASSWORD  the password of the ESRI argis Portal
+#       --mxd MXD            the mxd with sync with the ESRI argis Portal
+#       --service SERVICE    the link to !CORRESPONDING! mapservice of the mxd
 #-------------------------------------------------------------------------------
 import argparse, arcpy
 from portal import additem, shareItem, generateToken, getUserContent, updateItem
 from portal.metadata import metadata
+
+#Defaults globals
+PORTAL = "https://devas1179.dev.digant.antwerpen.local/arcgis"
+USER   = "JoostSchouppe"
+PASS   = "schouppe1"
+MXD = r"I:\2_05_06_Publicatie\Geoportaal_projectmap\testdata\data.mxd"
+SERVICE = "http://geodata.antwerpen.be/arcgissql/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
 
 def listLayersInMxd(mxdFile, token, service, user, portal):
     mxd = arcpy.mapping.MapDocument(mxdFile)
@@ -42,29 +50,22 @@ def addLyr(dataSource, name, nr, token, service, user, portal):
     existingIDs = { n['title'] : n['id'] for n in userContent["items"]}
 
     if name in existingIDs.keys():
-        print "updating " + name
+        print( "updating " + name )
         item = updateItem(user, token, portal, existingIDs[name], service + str(nr),
                  title=name, summary=meta.purpose, description=meta.description, author=author)
     else:
-        print "adding " + name
+        print( "adding " + name )
         item = additem( user, token, portal, service + str(nr),
              title=name, summary=meta.purpose, description=meta.description, author=author)
 
     if "success" in item.keys() and item["success"]:
         id = item["id"]
-        print shareItem(id, token, portal, True, True, [] )
+        print( shareItem(id, token, portal, True, True, []) )
     else:
         raise Exception( "Error uploading "+ name +" : "+ str(item) )
 
 
 def main():
-    #Defaults
-    PORTAL = "https://devas1179.dev.digant.antwerpen.local/arcgis"
-    USER   = "JoostSchouppe"
-    PASS   = "schouppe1"
-    MXD = r"I:\2_05_06_Publicatie\Geoportaal_projectmap\script\testdata\data.mxd"
-    SERVICE = "http://geodata.antwerpen.be/arcgissql/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
-    
     parser = argparse.ArgumentParser()
     parser.add_argument("--portal",   help="the link to the ESRI argis Portal", default=PORTAL)
     parser.add_argument("--user",     help="the username of the ESRI argis Portal", default=USER)

@@ -41,7 +41,6 @@ class metadata (object):
 
         arcpy.ImportMetadata_conversion(arcgisDatasource, "FROM_ARCGIS" , tempXML.name)
         arcpy.AddMessage("created tempfile: "+   tempXML.name )
-        print( "created tempfile: "+  tempXML.name )
         return metadata( tempXML.name , True)
 
     def _csvComp(self, inTxt ):
