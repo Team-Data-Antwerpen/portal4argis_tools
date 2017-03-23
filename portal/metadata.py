@@ -44,7 +44,7 @@ class metadata (object):
         return metadata( tempXML.name , True)
 
     def _csvComp(self, inTxt ):
-        return inTxt.replace("\n"," ").replace("\r"," ").replace(";",",")
+        return inTxt.replace("\n"," ").replace("\r"," ").strip('(,) ')
 
     def _getMetaData(self):
         if self.metaDataXML == None: return
@@ -69,10 +69,10 @@ class metadata (object):
         else: self.credits = ''
 
         contNodes = root.findall(".//rpIndName")
-        self.contacts = " - ".join( [self._csvComp( contNode.text ) for contNode in contNodes] )
+        self.contacts = " - ".join(  set([self._csvComp( contNode.text ) for contNode in contNodes]) )
 
         eMailAddNodes = root.findall(".//rpCntInfo/cntAddress/eMailAdd")
-        self.eMails = " - ".join( [self._csvComp( eMailAddNode.text ) for eMailAddNode in eMailAddNodes] )
+        self.eMails = " - ".join(  set([self._csvComp( eMailAddNode.text ) for eMailAddNode in eMailAddNodes]) )
 
         orgNode = root.find(".//rpOrgName")
         if orgNode <> None: self.orgname  = self._csvComp( orgNode.text )

@@ -38,13 +38,14 @@ def getItemInfo(itemId, token, portalUrl):
     return itemInfo
 
 def additem(user, token, portalUrl, url, title, summary="", description="",
-                             dtype="Map Service", tags="web", author="Stad Antwerpen"):
+                  dtype="Map Service", tags="web", author="Stad Antwerpen", bbox="4.2482, 51.1470, 4.4976, 51.377"):
     '''POST a new item to the portal:
         <PORTAL>/arcgis/portalhelp/apidocs/rest/index.html?groupsearch.html#/Add_Item/02t600000022000000/'''
     context = ssl._create_unverified_context() if NOSSL else None
     requestUrl = portalUrl +'/sharing/rest/content/users/'+ user +'/addItem'
     params = urllib.urlencode({
         'token' : token, 'f': 'json',
+        'extent': ", ".join(bbox) if type(bbox) == list else bbox,
         'URL': url, 'title': title.encode('utf-8').strip(),
         'snippet': summary[:250].encode('utf-8').strip(),
         'description': description.encode('utf-8').strip(),
@@ -58,7 +59,7 @@ def additem(user, token, portalUrl, url, title, summary="", description="",
     return item
 
 def updateItem(user, token, portalUrl, itemID, url=None, title=None, summary=None,
-               description=None, tags=None, author=None):
+               description=None, tags=None, author=None, bbox=None):
     '''modify a existing item: https://devas1179.dev.digant.antwerpen.local/arcgis/portalhelp/apidocs/rest/index.html?groupsearch.html#/Update_Item/02t60000000z000000/'''
     context = ssl._create_unverified_context() if NOSSL else None
     data = {'token' : token,'f' : 'json', "access": "public"}
@@ -68,6 +69,7 @@ def updateItem(user, token, portalUrl, itemID, url=None, title=None, summary=Non
     if description: data["description"] = description.encode('utf-8').strip()
     if tags: data["tags"] = tags.encode('utf-8').strip()
     if author: data["accessInformation"] = author.encode('utf-8').strip()
+    if bbox: data["extent"] = ", ".join(bbox) if type(bbox) == list else bbox
 
     requestUrl = portalUrl +'/sharing/rest/content/users/'+ user +'/items/' + itemID + "/update"
     request = Request(requestUrl, urllib.urlencode(data).encode())

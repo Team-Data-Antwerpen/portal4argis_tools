@@ -1,4 +1,4 @@
-Metadata to Portal 
+Upload Metadata to ESRI Arcgis Portal 
 ===================
 
 One the problems with the portal for arcgis is that the metadata of a dataset in the geodatabase, isn't uploaded to the  server. So the user needs to manualy copy paste the description of the layer, author, ... from metadata to the portal every time he edits the metadata.
@@ -7,7 +7,7 @@ This script will upload created a item in the portal with the correct metadata f
 
 So you can run this script daily to update changes in the metadata. 
 
-    usage: metadata2portal.py [-h] [--portal PORTAL] [--user USER]
+    usage: uploadMetadata2portal.py [-h] [--portal PORTAL] [--user USER]
                               [--password PASSWORD] [--mxd MXD]
                               [--service SERVICE]
 
