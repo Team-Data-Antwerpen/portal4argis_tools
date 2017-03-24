@@ -45,8 +45,8 @@ def main():
     #make sure service end with a slash
     service = args.service if args.service.endswith("/") else args.service + "/"
 
-    m2p = metadata2portal(args.user, args.password, args.portal, args.mxd, service)
-    m2p.uploadEveryLayerInMxd()
+    m2p = metadata2portal(args.user, args.password, args.portal)
+    m2p.uploadEveryLayerInMxd(args.mxd, service)
 
 if __name__ == '__main__':
     main()

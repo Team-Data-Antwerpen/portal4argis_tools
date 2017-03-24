@@ -35,6 +35,7 @@ class metadata (object):
 
     @staticmethod
     def metadataFromArcgis(arcgisDatasource):
+        "return a metadata object for the arcgisDatasource"
         tempXML = tempfile.NamedTemporaryFile(suffix=".xml", delete=False)
         tempXML.file.write(r'<?xml version="1.0"?><metadata xml:lang="nl"></metadata>')
         tempXML.file.close()
