@@ -22,4 +22,4 @@ So you can run this script daily to update changes in the metadata.
       --service SERVICE    the link to !CORRESPONDING! mapservice of the mxd
 
       
-<img src="https://docs.google.com/drawings/d/1sMhr11r6yopZ8S7nIzhhvZ8qKXnxMBoFWQJmwiquWqw/pub?w=926&amp;h=926">
+<img  width="450" src="https://docs.google.com/drawings/d/1sMhr11r6yopZ8S7nIzhhvZ8qKXnxMBoFWQJmwiquWqw/pub?w=926&amp;h=926">
