@@ -6,7 +6,7 @@ from urllib2 import Request, urlopen
 NOSSL  = True
 
 def generateToken(username, password, portalUrl):
-    'Retrieves a token to be used with API requests.'
+    """Retrieves a token to be used with API requests."""
     context = ssl._create_unverified_context() if NOSSL else None
     params = urllib.urlencode({'username' : username,
             'password' : password, 'client' : 'referer',
@@ -22,7 +22,7 @@ def generateToken(username, password, portalUrl):
         raise Exception( errMsg )
 
 def getUserContent(username, folder, token, portalUrl):
-    'Returns a list of all folders for the specified user.'
+    """Returns a list of all folders for the specified user."""
     context = ssl._create_unverified_context() if NOSSL else None
     params =  urllib.urlencode({'token': token, 'f': 'json'})
     request = portalUrl + '/sharing/rest/content/users/' + username +'/'+ folder +'?'+ params
@@ -30,7 +30,7 @@ def getUserContent(username, folder, token, portalUrl):
     return userContent
 
 def getItemInfo(itemId, token, portalUrl):
-    'Returns general information about the item.'
+    """Returns general information about the item."""
     context = ssl._create_unverified_context() if NOSSL else None
     params = urllib.urlencode({'token' : token,'f' : 'json'})
     request = portalUrl +'/sharing/content/items/'+ itemId +'?'+ params
@@ -39,8 +39,8 @@ def getItemInfo(itemId, token, portalUrl):
 
 def additem(user, token, portalUrl, url, title, summary="", description="",
                   dtype="Map Service", tags="web", author="Stad Antwerpen", bbox="4.2482, 51.1470, 4.4976, 51.377"):
-    '''POST a new item to the portal:
-        <PORTAL>/arcgis/portalhelp/apidocs/rest/index.html?groupsearch.html#/Add_Item/02t600000022000000/'''
+    """POST a new item to the portal:
+        <PORTAL>/arcgis/portalhelp/apidocs/rest/index.html?groupsearch.html#/Add_Item/02t600000022000000/"""
     context = ssl._create_unverified_context() if NOSSL else None
     requestUrl = portalUrl +'/sharing/rest/content/users/'+ user +'/addItem'
     params = urllib.urlencode({
@@ -49,7 +49,8 @@ def additem(user, token, portalUrl, url, title, summary="", description="",
         'URL': url, 'title': title.encode('utf-8').strip(),
         'snippet': summary[:250].encode('utf-8').strip(),
         'description': description.encode('utf-8').strip(),
-        'type': dtype, 'tags': tags.encode('utf-8').strip(),
+        'type': dtype,
+        'tags': tags.encode('utf-8').strip(),
         'accessInformation': author.encode('utf-8').strip(),
         "access": "public"
     }).encode()
@@ -60,7 +61,8 @@ def additem(user, token, portalUrl, url, title, summary="", description="",
 
 def updateItem(user, token, portalUrl, itemID, url=None, title=None, summary=None,
                description=None, tags=None, author=None, bbox=None):
-    '''modify a existing item: https://devas1179.dev.digant.antwerpen.local/arcgis/portalhelp/apidocs/rest/index.html?groupsearch.html#/Update_Item/02t60000000z000000/'''
+    """modify a existing item:
+       <PORTAL>/portalhelp/apidocs/rest/index.html?groupsearch.html#/Update_Item/02t60000000z000000/"""
     context = ssl._create_unverified_context() if NOSSL else None
     data = {'token' : token,'f' : 'json', "access": "public"}
     if url: data["URL"] = url

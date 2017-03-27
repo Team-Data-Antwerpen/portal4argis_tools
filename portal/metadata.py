@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as xml
 import os, tempfile, arcpy
 
+
 class metadata (object):
     __updateFreqCL = {
     '001':	'continual',
@@ -26,6 +27,7 @@ class metadata (object):
         self.contacts = None
         self.eMails = None
         self.orgname = None
+        self.tags = []
         self.metauri = None
         self.createDate = None
         self.pubDate = None
@@ -78,6 +80,8 @@ class metadata (object):
         orgNode = root.find(".//rpOrgName")
         if orgNode <> None: self.orgname  = self._csvComp( orgNode.text )
         else: self.orgname = ''
+
+        self.tags = [k.text for k in root.findall(".//keyword")]
 
         uriNode = root.find(".//dataSetURI")
         if uriNode <> None:self.metauri = self._csvComp( uriNode.text )

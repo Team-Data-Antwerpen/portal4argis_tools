@@ -12,9 +12,10 @@ class metadata2portal(object):
         self.existingIDs = { n['title'] : n['id'] for n in self.userContent["items"]}
 
     def updateToken(self):
+        """refresh the token, might be nessary if becomes invalid"""
         self.token = generateToken(self.user, self.password, self.portal)
         return self.token
-        
+
     def uploadEveryLayerInMxd(self, mxdFile, service):
         """Parse every layer in a *mxdFile* that corresponds with *service*
            and upload it as a item to portal"""
@@ -26,7 +27,7 @@ class metadata2portal(object):
             if hasattr(lyr, "dataSource") and arcpy.Exists(lyr.dataSource):
                 self.addLyr(lyr.dataSource, lyr.name, nr, service)
             else:
-                print( lyr.name + " has no valid datasource " )
+                arcpy.AddMessage( lyr.name + " has no valid datasource " )
 
             #generate new token every 50 uses
             if not nr%50 :
@@ -34,7 +35,7 @@ class metadata2portal(object):
 
     def addLyr(self, dataSource, name, nr, service):
         """Add *dataSource* to *portal* for *user* , as a item with *name*
-           reprsenting a layer in *service* with id *nr*."""
+           representing a layer in *service* with id *nr*."""
         meta = metadata.metadataFromArcgis( dataSource )
         author = meta.credits if len( meta.credits ) else "Stad Antwerpen"
 
@@ -47,16 +48,16 @@ class metadata2portal(object):
                     "\n<br/>Contact: " + meta.eMails )
 
         if name in self.existingIDs.keys():
-            print( "updating " + name )
+            arcpy.AddMessage( "updating " + name )
             item = updateItem(self.user, self.token, self.portal, self.existingIDs[name], service + str(nr),
-                     title=name, summary=meta.purpose, description=descrip, author=author)
+                    title=name, summary=meta.purpose, description=descrip, author=author, tags=",".join(meta.tags))
         else:
-            print( "adding " + name )
+            arcpy.AddMessage( "adding " + name )
             item = additem(self.user, self.token, self.portal, service + str(nr),
-                 title=name, summary=meta.purpose, description=descrip, author=author)
+                 title=name, summary=meta.purpose, description=descrip, author=author, tags=",".join(meta.tags) )
 
         if "success" in item.keys() and item["success"]:
             id = item["id"]
-            print( shareItem(id, self.token, self.portal, True, True, []) )
+            arcpy.AddMessage( shareItem(id, self.token, self.portal, True, True, []) )
         else:
             raise Exception( "Error uploading "+ name +" : "+ str(item) )
