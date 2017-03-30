@@ -78,6 +78,18 @@ def updateItem(user, token, portalUrl, itemID, url=None, title=None, summary=Non
     item = json.load( urlopen(request, context=context) )
     return item
 
+def getGroupID(groupName, token, portalUrl):
+    """ """
+    context = ssl._create_unverified_context() if NOSSL else None
+    params = urllib.urlencode({'token' : token, 'f' : 'json',
+                                    'q': groupName.encode('utf-8').strip() }).encode()
+    request = portalUrl +'/sharing/community/groups' +'?'+ params
+    query = json.load( urlopen(request, context=context) )
+
+    if "results" in query.keys() and len( query["results"] ):
+        return query["results"][0]["id"]
+
+
 def shareItem(itemId, token, portalUrl, everyone=True, organistion=True, groups=[]):
     """share a item"""
     context = ssl._create_unverified_context() if NOSSL else None

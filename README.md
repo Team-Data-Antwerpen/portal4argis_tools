@@ -20,6 +20,6 @@ So you can run this script daily to update changes in the metadata.
       --password PASSWORD  the password of the ESRI argis Portal
       --mxd MXD            the mxd with sync with the ESRI argis Portal
       --service SERVICE    the link to !CORRESPONDING! mapservice of the mxd
-
+      --group GROUP        add all layers to this group
       
 <img  width="450" src="https://docs.google.com/drawings/d/1sMhr11r6yopZ8S7nIzhhvZ8qKXnxMBoFWQJmwiquWqw/pub?w=926&amp;h=926">

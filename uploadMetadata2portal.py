@@ -14,12 +14,13 @@
 #                                [--password PASSWORD] [--service SERVICE]
 #
 # optional arguments:
-#       -h                   show this help message and exit
+#       -h --help            show this help message and exit
 #       --portal PORTAL      the link to the ESRI argis Portal
 #       --user USER          the username of the ESRI argis Portal
 #       --password PASSWORD  the password of the ESRI argis Portal
 #       --mxd MXD            the mxd to with sync with the ESRI argis Portal
 #       --service SERVICE    the link to !CORRESPONDING! mapservice of the mxd
+#       --group GROUP        add all layers to this group
 #---------------------------------------------------------------------------------
 import argparse, getpass
 from portal.metadata2portal import metadata2portal
@@ -31,12 +32,14 @@ USER    = ""
 PASS    = ""
 MXD     = ""
 SERVICE = ""
+GROUP   = ""
 #For Example:
-# PORTAL  = "https://devas1179.dev.digant.antwerpen.local/arcgis"
-# USER    = "JoostSchouppe"
-# PASS    = "schouppe1"
-# MXD     = r"I:\2_05_06_Publicatie\Geoportaal_projectmap\testdata\data.mxd"
-# SERVICE = "http://geodata.antwerpen.be/arcgissql/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
+##PORTAL  = "https://devas1179.dev.digant.antwerpen.local/arcgis"
+##USER    = "JoostSchouppe"
+##PASS    = "schouppe1"
+##MXD     = r"I:\2_05_06_Publicatie\Geoportaal_projectmap\testdata\data.mxd"
+##SERVICE = "http://geodata.antwerpen.be/arcgissql/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
+##GROUP   = "Basisdata"
 
 
 def main():
@@ -46,6 +49,7 @@ def main():
     parser.add_argument("--password",help="the password of the ESRI argis Portal", default=PASS)
     parser.add_argument("--mxd",     help="the mxd to with sync with the ESRI argis Portal", default=MXD)
     parser.add_argument("--service", help="the link to !CORRESPONDING! mapservice of the mxd", default=SERVICE)
+    parser.add_argument("--group", help="add all layers to this group", default=GROUP)
     args = parser.parse_args()
 
     if not args.user: user = raw_input("Username: ")
@@ -62,8 +66,11 @@ def main():
     #make sure service ends with a slash
     service = service if args.service.endswith("/") else service + "/"
 
+    if not args.group: groups = []
+    else: groups = [args.group]
+
     m2p = metadata2portal(user, password, args.portal)
-    m2p.uploadEveryLayerInMxd(mxd, service)
+    m2p.uploadEveryLayerInMxd(mxd, service, groups)
 
 if __name__ == '__main__':
     main()

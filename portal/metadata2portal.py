@@ -1,5 +1,5 @@
 import arcpy
-from portal import additem, shareItem, generateToken, getUserContent, updateItem
+from portal import additem, shareItem, generateToken, getUserContent, updateItem, getGroupID
 from metadata import metadata
 
 
@@ -16,16 +16,19 @@ class metadata2portal(object):
         self.token = generateToken(self.user, self.password, self.portal)
         return self.token
 
-    def uploadEveryLayerInMxd(self, mxdFile, service):
+    def uploadEveryLayerInMxd(self, mxdFile, service, groups=[]):
         """Parse every layer in a *mxdFile* that corresponds with *service*
            and upload it as a item to portal"""
         mxd = arcpy.mapping.MapDocument(mxdFile)
         lyrs = arcpy.mapping.ListLayers( mxd )
 
+        groupIDs = [getGroupID(g, self.token, self.portal) for g in groups]
+        print groupIDs
+
         for nr in range( len(lyrs)):
             lyr = lyrs[nr]
             if hasattr(lyr, "dataSource") and arcpy.Exists(lyr.dataSource):
-                self.addLyr(lyr.dataSource, lyr.name, nr, service)
+                self.addLyr(lyr.dataSource, lyr.name, nr, service, groupIDs)
             else:
                 arcpy.AddMessage( lyr.name + " has no valid datasource " )
 
@@ -33,7 +36,7 @@ class metadata2portal(object):
             if not nr%50 :
                 self.token = generateToken(self.user, self.password, self.portal)
 
-    def addLyr(self, dataSource, name, nr, service):
+    def addLyr(self, dataSource, name, nr, service, groupIDs=[]):
         """Add *dataSource* to *portal* for *user* , as a item with *name*
            representing a layer in *service* with id *nr*."""
         meta = metadata.metadataFromArcgis( dataSource )
@@ -58,6 +61,6 @@ class metadata2portal(object):
 
         if "success" in item.keys() and item["success"]:
             id = item["id"]
-            arcpy.AddMessage( shareItem(id, self.token, self.portal, True, True, []) )
+            arcpy.AddMessage( shareItem(id, self.token, self.portal, True, True, groupIDs) )
         else:
             raise Exception( "Error uploading "+ name +" : "+ str(item) )
