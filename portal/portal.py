@@ -95,9 +95,13 @@ def shareItem(itemId, token, portalUrl, everyone=True, organistion=True, groups=
     context = ssl._create_unverified_context() if NOSSL else None
     public = 'true' if everyone else 'false'
     org = 'true' if organistion else 'false'
+    
+    if len(groups) : 
+       sgroups = ",".join(groups).encode('utf-8').strip()
+       params = urllib.urlencode({'token' : token, 'f' : 'json', 'org': org, 'everyone': public, 'groups': sgroups }).encode()
+    else:
 
-    params = urllib.urlencode({'token' : token, 'f' : 'json', 'org': org,
-                               'everyone': public, 'groups': ",".join(groups).encode('utf-8').strip() }).encode()
+       params = urllib.urlencode({'token' : token, 'f' : 'json', 'org': org, 'everyone': public }).encode()
 
     requestUrl = portalUrl +'/sharing/content/items/'+ itemId + '/share'
     request = Request(requestUrl, params)

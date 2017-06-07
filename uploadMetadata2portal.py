@@ -22,25 +22,27 @@
 #       --service SERVICE    the link to !CORRESPONDING! mapservice of the mxd
 #       --group GROUP        add all layers to this group
 #---------------------------------------------------------------------------------
-import argparse, getpass
-from portal.metadata2portal import metadata2portal
+import argparse
+import getpass
+from   portal.metadata2portal import metadata2portal
 
 #add your portal-url, username and pasword, mxd and corresponding mapservice
 #if you dont want to use comamndline parameters:
-PORTAL  = "https://www.arcgis.com"
-USER    = ""
-PASS    = ""
-MXD     = ""
-SERVICE = ""
-GROUP   = ""
+PORTAL  = "https://ras1453.rte.antwerpen.local:7443/arcgis"
+USER    = "PortalAdmin"
+PASS    = "nimdaPortal.1"
+MXD     = r"\\antwerpen.local\Doc\OD_IF_AUD\2_05_GIS\2_05_06_Publicatie\mapservice\P_Portal\portal_stad.mxd"
+SERVICE = "https://geoint.antwerpen.be/arcgissql/rest/services/P_Portal/portal_stad/MapServer"
+GROUP   = "Basisdata"
+WS = "D:\sdedgeo.sde"
 #For Example:
-##PORTAL  = "https://devas1179.dev.digant.antwerpen.local/arcgis"
-##USER    = "JoostSchouppe"
-##PASS    = "schouppe1"
-##MXD     = r"I:\2_05_06_Publicatie\Geoportaal_projectmap\testdata\data.mxd"
-##SERVICE = "http://geodata.antwerpen.be/arcgissql/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
-##GROUP   = "Basisdata"
-
+##PORTAL = "https://devas1179.dev.digant.antwerpen.local/arcgis"
+##USER = "JoostSchouppe"
+##PASS = "schouppe1"
+##MXD = r"\\antwerpen.local\Doc\OD_IF_AUD\2_05_GIS\2_05_06_Publicatie\Geoportaal_projectmap\testdata\data.mxd"
+##SERVICE =
+##"http://geodata.antwerpen.be/arcgissql/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
+##GROUP = "Basisdata"
 
 def main():
     parser = argparse.ArgumentParser()
@@ -49,17 +51,18 @@ def main():
     parser.add_argument("--password",help="the password of the ESRI argis Portal", default=PASS)
     parser.add_argument("--mxd",     help="the mxd to with sync with the ESRI argis Portal", default=MXD)
     parser.add_argument("--service", help="the link to !CORRESPONDING! mapservice of the mxd", default=SERVICE)
-    parser.add_argument("--group", help="add all layers to this group", default=GROUP)
+    parser.add_argument("--group",   help="add all layers to this group", default=GROUP)
+    parser.add_argument("--ws",   help="override workspace, for example .sde file", default=WS)
     args = parser.parse_args()
 
     if not args.user: user = raw_input("Username: ")
-    else: user= args.user
+    else: user = args.user
 
     if not args.password: password = getpass.getpass()
-    else: password= args.password
+    else: password = args.password
 
     if not args.mxd: mxd = raw_input("ESRI mapdocument (*mxd): ")
-    else: mxd= args.mxd
+    else: mxd = args.mxd
 
     if not args.service: service = raw_input("ESRI mapservice (url): ")
     else: service = args.service
@@ -69,7 +72,11 @@ def main():
     if not args.group: groups = []
     else: groups = [args.group]
 
-    m2p = metadata2portal(user, password, args.portal)
+    if not args.ws: ws = None
+    else: ws = args.ws
+
+    m2p = metadata2portal(user, password, args.portal, ws)
+    print groups
     m2p.uploadEveryLayerInMxd(mxd, service, groups)
 
 if __name__ == '__main__':

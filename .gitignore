@@ -1,5 +1,8 @@
 # user
 testdata/
+*.suo
+*.sln
+*.pyproj
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
