@@ -7,11 +7,11 @@
 # Author:      Kay Warrie
 #
 # Created:     20/03/2017
-# Copyright:   (c) Kay Warrie 2017
+# Copyright:   (c) Stad Antwerpen 2017
 # Licence:     MIT
 #
 # usage: uploadMetadata2portal.py [-h] [--portal PORTAL] [--user USER] [--mxd MXD]
-#                                [--password PASSWORD] [--service SERVICE]
+#                              [--password PASSWORD] [--service SERVICE] [--ws WS]
 #
 # optional arguments:
 #       -h --help            show this help message and exit
@@ -21,6 +21,8 @@
 #       --mxd MXD            the mxd to with sync with the ESRI argis Portal
 #       --service SERVICE    the link to !CORRESPONDING! mapservice of the mxd
 #       --group GROUP        add all layers to this group
+#       --ws WS              worskpace a location of a geodatabase that overwrites
+#                            the location in the mxd, for example a .sde file
 #---------------------------------------------------------------------------------
 import argparse
 import getpass
@@ -28,21 +30,21 @@ from   portal.metadata2portal import metadata2portal
 
 #add your portal-url, username and pasword, mxd and corresponding mapservice
 #if you dont want to use comamndline parameters:
-PORTAL  = "https://ras1453.rte.antwerpen.local:7443/arcgis"
-USER    = "PortalAdmin"
-PASS    = "nimdaPortal.1"
-MXD     = r"\\antwerpen.local\Doc\OD_IF_AUD\2_05_GIS\2_05_06_Publicatie\mapservice\P_Portal\portal_stad.mxd"
-SERVICE = "https://geoint.antwerpen.be/arcgissql/rest/services/P_Portal/portal_stad/MapServer"
-GROUP   = "Basisdata"
-WS = "D:\sdedgeo.sde"
+PORTAL  = "https://arcgis.com"
+USER    = ""
+PASS    = ""
+MXD     = ""
+SERVICE = ""
+GROUP   = ""
+WS = ""
 #For Example:
 ##PORTAL = "https://devas1179.dev.digant.antwerpen.local/arcgis"
 ##USER = "JoostSchouppe"
 ##PASS = "schouppe1"
 ##MXD = r"\\antwerpen.local\Doc\OD_IF_AUD\2_05_GIS\2_05_06_Publicatie\Geoportaal_projectmap\testdata\data.mxd"
-##SERVICE =
-##"http://geodata.antwerpen.be/arcgissql/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
+##SERVICE = "http://geodata.antwerpen.be/arcgissql/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
 ##GROUP = "Basisdata"
+##WS = "D:\sdedgeo.sde"
 
 def main():
     parser = argparse.ArgumentParser()
@@ -52,7 +54,7 @@ def main():
     parser.add_argument("--mxd",     help="the mxd to with sync with the ESRI argis Portal", default=MXD)
     parser.add_argument("--service", help="the link to !CORRESPONDING! mapservice of the mxd", default=SERVICE)
     parser.add_argument("--group",   help="add all layers to this group", default=GROUP)
-    parser.add_argument("--ws",   help="override workspace, for example .sde file", default=WS)
+    parser.add_argument("--ws",      help="worskpace a location of a geodatabase that overwrites the location in the mxd, for example a .sde file", default=WS)
     args = parser.parse_args()
 
     if not args.user: user = raw_input("Username: ")
