@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as xml
-import os, tempfile, arcpy
+import os, tempfile
 
 
 class metadata (object):
@@ -18,6 +18,7 @@ class metadata (object):
     '012':	'unknown'}
 
     def __init__(self, inXML=None, isTemp=False):
+        """read metadata from argis sources in xml-format"""
         self.metaDataXML = inXML
         self.isTemp = isTemp
         self.title = None
@@ -42,6 +43,7 @@ class metadata (object):
         tempXML.file.write(r'<?xml version="1.0"?><metadata xml:lang="nl"></metadata>')
         tempXML.file.close()
 
+        import arcpy #arcpy is only needed here
         arcpy.ImportMetadata_conversion(arcgisDatasource, "FROM_ARCGIS" , tempXML.name)
         arcpy.AddMessage("created tempfile: "+   tempXML.name )
         return metadata( tempXML.name , True)

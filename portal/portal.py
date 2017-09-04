@@ -79,7 +79,7 @@ def updateItem(user, token, portalUrl, itemID, url=None, title=None, summary=Non
     return item
 
 def getGroupID(groupName, token, portalUrl):
-    """ """
+    """Get the unique ID of a group by name"""
     context = ssl._create_unverified_context() if NOSSL else None
     params = urllib.urlencode({'token' : token, 'f' : 'json',
                                     'q': groupName.encode('utf-8').strip() }).encode()

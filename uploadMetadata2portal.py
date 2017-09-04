@@ -24,8 +24,7 @@
 #       --ws WS              worskpace a location of a geodatabase that overwrites
 #                            the location in the mxd, for example a .sde file
 #---------------------------------------------------------------------------------
-import argparse
-import getpass
+import argparse, getpass
 from   portal.metadata2portal import metadata2portal
 
 #add your portal-url, username and pasword, mxd and corresponding mapservice
@@ -38,11 +37,11 @@ SERVICE = ""
 GROUP   = ""
 WS = ""
 #For Example:
-##PORTAL = "https://devas1179.dev.digant.antwerpen.local/arcgis"
-##USER = "JoostSchouppe"
-##PASS = "schouppe1"
-##MXD = r"\\antwerpen.local\Doc\OD_IF_AUD\2_05_GIS\2_05_06_Publicatie\Geoportaal_projectmap\testdata\data.mxd"
-##SERVICE = "http://geodata.antwerpen.be/arcgissql/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
+##PORTAL = "https://your_portal_server/arcgis"
+##USER = "AdminUser"
+##PASS = "password"
+##MXD = r"\\antwerpen.local\Doc\OD_IF_AUD\2_05_GIS\2_05_06_Publicatie\mapservice\P_Publiek\OpenDataAntwerpen.mxd"
+##SERVICE = "http://geodata.antwerpen.be/arcgis/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
 ##GROUP = "Basisdata"
 ##WS = "D:\sdedgeo.sde"
 

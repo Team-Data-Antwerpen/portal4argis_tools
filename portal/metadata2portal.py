@@ -5,6 +5,7 @@ from ESRImapservice import ESRImapservice
 
 class metadata2portal(object):
     def __init__(self, user, password, portal, worksspace):
+        """Connect to portal with username and pasword, also set the local workspace"""
         self.user = user
         self.password = password
         self.portal = portal
@@ -27,7 +28,7 @@ class metadata2portal(object):
         lyrs = arcpy.mapping.ListLayers( mxd )
 
         groupIDs = [getGroupID(g, self.token, self.portal) for g in groups]
-        if len(groups) and len(groupIDs): print groups[0] + " > " +  groupIDs[0] 
+        if len(groups) and len(groupIDs): arcpy.AddMessage( groups[0] + " > " +  groupIDs[0] )
 
         ms = ESRImapservice(service)
 
@@ -43,9 +44,9 @@ class metadata2portal(object):
             if arcpy.Exists(ds):
                 id = ms.findLayerID( lyr.name )
                 if id >= 0: self.addLyr(ds, lyr.name, id, service, groupIDs)
-                else: print("could not find " + lyr.name + " mapservice: " + service )
+                else: arcpy.AddWarning("could not find " + lyr.name + " mapservice: " + service )
             else:
-                print( lyr.name + " has no valid datasource " )
+                arcpy.AddMessage( lyr.name + " has no valid datasource " )
                 #arcpy.AddMessage( lyr.name + " has no valid datasource " )
 
             #generate new token every 50 uses
@@ -67,16 +68,16 @@ class metadata2portal(object):
                     "\n<br/>&nbsp;Contact: " + meta.eMails )
 
         if name in self.existingIDs.keys():
-            print( "updating " + name )
+            arcpy.AddMessage( "updating " + name )
             item = updateItem(self.user, self.token, self.portal, self.existingIDs[name], service + str(nr),
                   title=name, summary=meta.purpose, description=descrip, author=author, tags=",".join(meta.tags))
         else:
-            print( "adding " + name )
+            arcpy.AddMessage( "adding " + name )
             item = additem(self.user, self.token, self.portal, service + str(nr),
                  title=name, summary=meta.purpose, description=descrip, author=author, tags=",".join(meta.tags) )
 
         if "success" in item.keys() and item["success"]:
             id = item["id"]
-            print( shareItem(id, self.token, self.portal, True, True, groupIDs) )
+            arcpy.AddMessage( shareItem(id, self.token, self.portal, True, True, groupIDs) )
         else:
             raise Exception( "Error uploading "+ name +" : "+ str(item) )

@@ -5,7 +5,7 @@ One the problems with the portal for arcgis is that the metadata of a dataset in
 
 This script will upload created a item in the portal with the correct metadata for every item in a Arcgis mapdocument. The user needs to provide the link to the service. If a item already exists with the same name it will be overwriten. 
 
-It is very important that the layer order in the mxd corresponds with id's of the service. Also if you change a name of a item or move it. Then the layer will be added again as new item the next time you run the script, instead of updating it. 
+It is very important that the layername order in the mxd corresponds with name in the service. Also if you change a name of a item or move it. Then the layer will be added again as new item the next time you run the script, instead of updating it. 
 
 So you can run this script daily to update changes in the metadata. 
 
