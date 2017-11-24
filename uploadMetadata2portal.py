@@ -29,13 +29,14 @@ from   portal.metadata2portal import metadata2portal
 
 #add your portal-url, username and pasword, mxd and corresponding mapservice
 #if you dont want to use comamndline parameters:
-PORTAL  = "https://arcgis.com"
-USER    = ""
-PASS    = ""
-MXD     = ""
-SERVICE = ""
-GROUP   = ""
-WS = ""
+PORTAL  = "https://ras1472.rte.antwerpen.local:7443/arcgis/"   #"https://arcgis.com"
+USER    = "PortalAdmin"
+PASS    = "nimdaPortal.1"
+MXD     = r"\\antwerpen.local\Doc\OD_IF_AUD\2_05_GIS\2_05_06_Publicatie\mapservice\P_Portal\portal_publiek_104.mxd"
+SERVICE = "https://geoint.antwerpen.be/arcgissql/rest/services/P_Portal/portal_publiek/MapServer/"
+GROUP   = "Basisdata"
+WS      = "D:\sdedgeo.sde"
+DEL_GRP = True
 #For Example:
 ##PORTAL = "https://your_portal_server/arcgis"
 ##USER = "AdminUser"
@@ -54,6 +55,8 @@ def main():
     parser.add_argument("--service", help="the link to !CORRESPONDING! mapservice of the mxd", default=SERVICE)
     parser.add_argument("--group",   help="add all layers to this group", default=GROUP)
     parser.add_argument("--ws",      help="worskpace a location of a geodatabase that overwrites the location in the mxd, for example a .sde file", default=WS)
+    parser.add_argument("--del_if_in_group_not_in_mxd", help="Will delete al layers not in mxd but in group, skip if no group", default=DEL_GRP)
+
     args = parser.parse_args()
 
     if not args.user: user = raw_input("Username: ")
@@ -76,9 +79,9 @@ def main():
     if not args.ws: ws = None
     else: ws = args.ws
 
-    m2p = metadata2portal(user, password, args.portal, ws)
+    m2p = metadata2portal(user, password, args.portal, ws, groups)
     print groups
-    m2p.uploadEveryLayerInMxd(mxd, service, groups)
+    m2p.uploadEveryLayerInMxd(mxd, service, args.del_if_in_group_not_in_mxd)
 
 if __name__ == '__main__':
     main()

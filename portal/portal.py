@@ -1,4 +1,5 @@
-# util labrary to work with portal, like: http://server.arcgis.com/en/portal/latest/administer/linux/example-transfer-item-ownership.htm
+# util labrary to work with portal, like:
+# http://server.arcgis.com/en/portal/latest/administer/linux/example-transfer-item-ownership.htm
 
 import urllib, json, ssl
 from urllib2 import Request, urlopen
@@ -21,8 +22,20 @@ def generateToken(username, password, portalUrl):
             errMsg += "\n"+ detail
         raise Exception( errMsg )
 
+def getGroupContent( groupname, token, portalUrl):
+    "Returns a list of all data for the specified group."
+    context = ssl._create_unverified_context() if NOSSL else None
+    groupID = getGroupID(groupname, token, portalUrl)
+    if groupID:
+       params =  urllib.urlencode({'token': token, 'f': 'json'})
+       request = portalUrl + '/sharing/rest/content/groups/'+ groupID + '?'+ params
+       userContent = json.load( urllib.urlopen(request, context=context) )
+       return userContent
+    else: 
+       raise Exception("group with name: "+ groupname +" could not be found")
+
 def getUserContent(username, folder, token, portalUrl):
-    """Returns a list of all folders for the specified user."""
+    """Returns a list of all data for the specified user."""
     context = ssl._create_unverified_context() if NOSSL else None
     params =  urllib.urlencode({'token': token, 'f': 'json'})
     request = portalUrl + '/sharing/rest/content/users/' + username +'/'+ folder +'?'+ params
@@ -33,7 +46,7 @@ def getItemInfo(itemId, token, portalUrl):
     """Returns general information about the item."""
     context = ssl._create_unverified_context() if NOSSL else None
     params = urllib.urlencode({'token' : token,'f' : 'json'})
-    request = portalUrl +'/sharing/content/items/'+ itemId +'?'+ params
+    request = portalUrl +'/sharing/rest/content/items/'+ itemId +'?'+ params
     itemInfo = json.load( urlopen(request, context=context) )
     return itemInfo
 
@@ -46,7 +59,8 @@ def additem(user, token, portalUrl, url, title, summary="", description="",
     params = urllib.urlencode({
         'token' : token, 'f': 'json',
         'extent': ", ".join(bbox) if type(bbox) == list else bbox,
-        'URL': url, 'title': title.encode('utf-8').strip(),
+        'URL': url, 
+        'title': title.encode('utf-8'),
         'snippet': summary[:250].encode('utf-8').strip(),
         'description': description.encode('utf-8').strip(),
         'type': dtype,
@@ -83,7 +97,7 @@ def getGroupID(groupName, token, portalUrl):
     context = ssl._create_unverified_context() if NOSSL else None
     params = urllib.urlencode({'token' : token, 'f' : 'json',
                                     'q': groupName.encode('utf-8').strip() }).encode()
-    request = portalUrl +'/sharing/community/groups' +'?'+ params
+    request = portalUrl +'/sharing/rest/community/groups' +'?'+ params
     query = json.load( urlopen(request, context=context) )
 
     if "results" in query.keys() and len( query["results"] ):
@@ -98,12 +112,21 @@ def shareItem(itemId, token, portalUrl, everyone=True, organistion=True, groups=
     
     if len(groups) : 
        sgroups = ",".join(groups).encode('utf-8').strip()
-       params = urllib.urlencode({'token' : token, 'f' : 'json', 'org': org, 'everyone': public, 'groups': sgroups }).encode()
+       params = urllib.urlencode({'token' : token, 'f': 'json', 'org': org, 'everyone': public, 'groups': sgroups }).encode()
     else:
 
-       params = urllib.urlencode({'token' : token, 'f' : 'json', 'org': org, 'everyone': public }).encode()
+       params = urllib.urlencode({'token' : token, 'f': 'json', 'org': org, 'everyone': public }).encode()
 
-    requestUrl = portalUrl +'/sharing/content/items/'+ itemId + '/share'
+    requestUrl = portalUrl +'/sharing/rest/content/items/'+ itemId + '/share'
+    request = Request(requestUrl, params)
+    item = json.load( urlopen(request, context=context) )
+    return item
+
+def deleteItem(itemId, token, portalUrl):
+    """delete a item"""
+    context = ssl._create_unverified_context() if NOSSL else None
+    params = urllib.urlencode({'token' : token, 'f' : 'json'}).encode()
+    requestUrl = portalUrl +'/sharing/rest/content/items/'+ itemId + '/delete'
     request = Request(requestUrl, params)
     item = json.load( urlopen(request, context=context) )
     return item
