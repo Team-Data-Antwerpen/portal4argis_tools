@@ -29,13 +29,13 @@ from   portal.metadata2portal import metadata2portal
 
 #add your portal-url, username and pasword, mxd and corresponding mapservice
 #if you dont want to use comamndline parameters:
-PORTAL  = "https://ras1472.rte.antwerpen.local:7443/arcgis/"   #"https://arcgis.com"
-USER    = "PortalAdmin"
-PASS    = "nimdaPortal.1"
-MXD     = r"\\antwerpen.local\Doc\OD_IF_AUD\2_05_GIS\2_05_06_Publicatie\mapservice\P_Portal\portal_publiek_104.mxd"
-SERVICE = "https://geoint.antwerpen.be/arcgissql/rest/services/P_Portal/portal_publiek/MapServer/"
-GROUP   = "Basisdata"
-WS      = "D:\sdedgeo.sde"
+PORTAL  = "https://arcgis.com"
+USER    = ""
+PASS    = ""
+MXD     = ""
+SERVICE = ""
+GROUP   = ""
+WS      = ""
 DEL_GRP = True
 #For Example:
 ##PORTAL = "https://your_portal_server/arcgis"
@@ -45,6 +45,7 @@ DEL_GRP = True
 ##SERVICE = "http://geodata.antwerpen.be/arcgis/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
 ##GROUP = "Basisdata"
 ##WS = "D:\sdedgeo.sde"
+#DEL_GRP = True
 
 def main():
     parser = argparse.ArgumentParser()

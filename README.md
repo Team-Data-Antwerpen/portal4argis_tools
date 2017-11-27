@@ -10,19 +10,24 @@ It is very important that the layername order in the mxd corresponds with name i
 So you can run this script daily to update changes in the metadata. 
 
     usage: uploadMetadata2portal.py [-h] [--portal PORTAL] [--user USER]
-                              [--password PASSWORD] [--mxd MXD]
-                              [--service SERVICE]
+                                    [--password PASSWORD] [--mxd MXD]
+                                    [--service SERVICE] [--group GROUP] [--ws WS]
+                                    [--del_if_in_group_not_in_mxd DEL_IF_IN_GROUP_NOT_IN_MXD]
 
     optional arguments:
-      -h, --help           show this help message and exit
-      --portal PORTAL      the link to the ESRI argis Portal
-      --user USER          the username of the ESRI argis Portal
-      --password PASSWORD  the password of the ESRI argis Portal
-      --mxd MXD            the mxd with sync with the ESRI argis Portal
-      --service SERVICE    the link to !CORRESPONDING! mapservice of the mxd
-      --group GROUP        add all layers to this group
-      --ws                 worskpace a location of a geodatabase that overwrites
-                          the location in the mxd, for example a .sde file
+      -h, --help            show this help message and exit
+      --portal PORTAL       the link to the ESRI argis Portal, default is Arcgis
+                            online
+      --user USER           the username of the ESRI argis Portal
+      --password PASSWORD   the password of the ESRI argis Portal
+      --mxd MXD             the mxd to with sync with the ESRI argis Portal
+      --service SERVICE     the link to !CORRESPONDING! mapservice of the mxd
+      --group GROUP         add all layers to this group
+      --ws WS               worskpace a location of a geodatabase that overwrites
+                            the location in the mxd, for example a .sde file
+      --del_if_in_group_not_in_mxd DEL_IF_IN_GROUP_NOT_IN_MXD
+                            Will delete al layers not in mxd but in group, skip if
+                            no group
 
       
 <img  width="450" src="https://docs.google.com/drawings/d/1sMhr11r6yopZ8S7nIzhhvZ8qKXnxMBoFWQJmwiquWqw/pub?w=926&amp;h=926">
