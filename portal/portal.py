@@ -114,7 +114,6 @@ def shareItem(itemId, token, portalUrl, everyone=True, organistion=True, groups=
        sgroups = ",".join(groups).encode('utf-8').strip()
        params = urllib.urlencode({'token' : token, 'f': 'json', 'org': org, 'everyone': public, 'groups': sgroups }).encode()
     else:
-
        params = urllib.urlencode({'token' : token, 'f': 'json', 'org': org, 'everyone': public }).encode()
 
     requestUrl = portalUrl +'/sharing/rest/content/items/'+ itemId + '/share'
@@ -122,11 +121,11 @@ def shareItem(itemId, token, portalUrl, everyone=True, organistion=True, groups=
     item = json.load( urlopen(request, context=context) )
     return item
 
-def deleteItem(itemId, token, portalUrl):
+def deleteItem(itemId, token, portalUrl, userid):
     """delete a item"""
     context = ssl._create_unverified_context() if NOSSL else None
     params = urllib.urlencode({'token' : token, 'f' : 'json'}).encode()
-    requestUrl = portalUrl +'/sharing/rest/content/items/'+ itemId + '/delete'
-    request = Request(requestUrl, params)
-    item = json.load( urlopen(request, context=context) )
+    requestUrl = portalUrl +'/sharing/rest/content/users/' + userid + '/items/' + itemId + '/delete'
+    response = urlopen(requestUrl, params, context=context)
+    item = json.load( response )
     return item

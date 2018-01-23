@@ -1,4 +1,4 @@
-import arcpy, os
+import arcpy, os, json
 from portal import additem, shareItem, generateToken, getUserContent, updateItem, getGroupID, deleteItem, getGroupContent
 from metadata import metadata
 from ESRImapservice import ESRImapservice
@@ -19,12 +19,11 @@ class metadata2portal(object):
         
         self.existingIDs = { n['title'] : n['id'] for n in self.userContent["items"]}
         self.LayersFoundinMXD = []
-
         self.ws = worksspace
         if worksspace: arcpy.env.workspace = worksspace
 
     def updateToken(self):
-        """refresh the token, might be nessary if becomes invalid"""
+        """refresh the token, might be necessary if becomes invalid"""
         self.token = generateToken(self.user, self.password, self.portal)
         return self.token
 
@@ -39,7 +38,7 @@ class metadata2portal(object):
             lyr = lyrs[nr]
             if not hasattr(lyr, "dataSource"): continue
 
-            if self.ws:
+            if self.ws and os.path.dirname(lyr.dataSource).endswith('.sde'):
                ds = os.path.join(self.ws , os.path.basename(lyr.dataSource) )
             else:
                ds = lyr.dataSource
@@ -60,7 +59,7 @@ class metadata2portal(object):
             for lr in layersRemaining:
                self.delLyr(lr)
         else:
-            print ("no leyers to delete")
+            arcpy.AddMessage("no leyers to delete")
 
     def addLyr(self, dataSource, name, nr, service, groupIDs=[]):
         """Add *dataSource* to *portal* for *user* , as a item with *name*
@@ -93,13 +92,12 @@ class metadata2portal(object):
             raise Exception( "Error uploading "+ name +" : "+ str(item) )
       
 
-    def delLyr(self, name, onlyIfinMS=None):
+    def delLyr(self, name):
         if name in self.existingIDs.keys():
-           if onlyIfinMS:
-              pass #TODO
-           else:
-               result = deleteItem( self.existingIDs[name] , self.token, self.portal)
+           result = deleteItem(self.existingIDs[name] , self.token, self.portal, self.user)
            if "success" in result.keys() and result["success"]:
-                arcpy.AddMessage("Deleted layer: " + name )
+               arcpy.AddMessage("Deleted layer: " + name )
+           elif "success" in result.keys() and not result["success"]:
+               raise Exception( "Error deleting "+ name +" "+ json.dumps(result))
            else:
-                raise Exception( "Error deleting "+ name  )
+               arcpy.AddMessage("unsure of success for layer "+ name +" "+ json.dumps(result)) 

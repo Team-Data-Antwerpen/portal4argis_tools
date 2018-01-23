@@ -37,15 +37,6 @@ SERVICE = ""
 GROUP   = ""
 WS      = ""
 DEL_GRP = True
-#For Example:
-##PORTAL = "https://your_portal_server/arcgis"
-##USER = "AdminUser"
-##PASS = "password"
-##MXD = r"\\antwerpen.local\Doc\OD_IF_AUD\2_05_GIS\2_05_06_Publicatie\mapservice\P_Publiek\OpenDataAntwerpen.mxd"
-##SERVICE = "http://geodata.antwerpen.be/arcgis/rest/services/P_Publiek/OpenDataAntwerpen/MapServer/"
-##GROUP = "Basisdata"
-##WS = "D:\sdedgeo.sde"
-#DEL_GRP = True
 
 def main():
     parser = argparse.ArgumentParser()
@@ -81,7 +72,6 @@ def main():
     else: ws = args.ws
 
     m2p = metadata2portal(user, password, args.portal, ws, groups)
-    print groups
     m2p.uploadEveryLayerInMxd(mxd, service, args.del_if_in_group_not_in_mxd)
 
 if __name__ == '__main__':
