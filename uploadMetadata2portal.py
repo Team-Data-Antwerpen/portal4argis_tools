@@ -26,16 +26,17 @@
 #---------------------------------------------------------------------------------
 import argparse, getpass
 from   portal.metadata2portal import metadata2portal
-
+from   portal.csvportal import csvportal
 #add your portal-url, username and pasword, mxd and corresponding mapservice
 #if you dont want to use comamndline parameters:
 PORTAL  = "https://arcgis.com"
 USER    = ""
 PASS    = ""
-MXD     = ""
+MXD     = r""
+CSV     = r""
 SERVICE = ""
 GROUP   = ""
-WS      = ""
+WS      = r""
 DEL_GRP = True
 
 def main():
@@ -44,6 +45,9 @@ def main():
     parser.add_argument("--user",    help="the username of the ESRI argis Portal", default=USER)
     parser.add_argument("--password",help="the password of the ESRI argis Portal", default=PASS)
     parser.add_argument("--mxd",     help="the mxd to with sync with the ESRI argis Portal", default=MXD)
+    parser.add_argument("--csv",     help="""the csv to with featurs sync with the ESRI argis Portal, 
+        The csv has the follwing sturcture: firstline=headers, following lines:  name;path;url
+        if this argument is added --mxd and --service wil be ignored.""", default=CSV)
     parser.add_argument("--service", help="the link to !CORRESPONDING! mapservice of the mxd", default=SERVICE)
     parser.add_argument("--group",   help="add all layers to this group", default=GROUP)
     parser.add_argument("--ws",      help="worskpace a location of a geodatabase that overwrites the location in the mxd, for example a .sde file", default=WS)
@@ -57,22 +61,28 @@ def main():
     if not args.password: password = getpass.getpass()
     else: password = args.password
 
-    if not args.mxd: mxd = raw_input("ESRI mapdocument (*mxd): ")
-    else: mxd = args.mxd
+    if args.csv == "" or args.csv is None:
+       if not args.mxd: mxd = raw_input("ESRI mapdocument (*mxd): ")
+       else: mxd = args.mxd
 
-    if not args.service: service = raw_input("ESRI mapservice (url): ")
-    else: service = args.service
-    #make sure service ends with a slash
-    service = service if args.service.endswith("/") else service + "/"
+       if not args.service: service = raw_input("ESRI mapservice (url): ")
+       else: service = args.service
+       #make sure service ends with a slash
+       service = service if args.service.endswith("/") else service + "/"
 
     if not args.group: groups = []
     else: groups = [args.group]
 
     if not args.ws: ws = None
     else: ws = args.ws
+    
+    if not args.csv : 
+       m2p = metadata2portal(user, password, args.portal, ws, groups)
+       m2p.uploadEveryLayerInMxd(mxd, service, args.del_if_in_group_not_in_mxd)
+    else:
+       c2p = csvportal(user, password, args.portal, ws, groups)
+       c2p.uploadCsv(args.csv)
 
-    m2p = metadata2portal(user, password, args.portal, ws, groups)
-    m2p.uploadEveryLayerInMxd(mxd, service, args.del_if_in_group_not_in_mxd)
 
 if __name__ == '__main__':
     main()

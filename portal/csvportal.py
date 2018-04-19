@@ -1,9 +1,10 @@
-import arcpy, os, json
+import arcpy, os, json, csv
 from portal import additem, shareItem, generateToken, getUserContent, updateItem, getGroupID, deleteItem, getGroupContent
 from metadata import metadata
 from ESRImapservice import ESRImapservice
 
-class metadata2portal(object):
+
+class csvportal(object):
     def __init__(self, user, password, portal, worksspace, groups=[]):
         """Connect to portal with username and pasword, also set the local workspace"""
         self.user = user
@@ -27,69 +28,56 @@ class metadata2portal(object):
         self.token = generateToken(self.user, self.password, self.portal)
         return self.token
 
-    def uploadEveryLayerInMxd(self, mxdFile, service, deleteRemaining=True):
-        """Parse every layer in a *mxdFile* that corresponds with *service*
-           and upload it as a item to portal"""
-        mxd = arcpy.mapping.MapDocument(mxdFile)
-        lyrs = arcpy.mapping.ListLayers( mxd )
-        ms = ESRImapservice(service)
+    def uploadCsv(self, csvpath, sep=";", headerlines=1, nameCol=0, pathCol=1, urlCol=2):
+        """upload every row in a csv"""
+        with open( csvpath , 'rb') as csvfile:
+            nr = 0
+            csv_reader = csv.reader(csvfile, dialect=csv.excel, delimiter=sep)
+            for n in range(headerlines): csv_reader.next()
+            for row in csv_reader:
+               line =  [unicode(cell, 'latin-1') for cell in row]
+               name, ds, url = (line[nameCol], line[pathCol], line[urlCol])
+               if self.ws and os.path.dirname(ds).endswith('.sde'):
+                  ds = os.path.join(self.ws , os.path.basename(ds) )
+               
+               self.addLyr(ds, name, url, self.groupIDs)
 
-        for nr in range( len(lyrs)):
-            lyr = lyrs[nr]
-            if not hasattr(lyr, "dataSource"): continue
+               #generate new token every 50 uses
+               if not nr%50 : self.token = generateToken(self.user, self.password, self.portal)
+               nr += 1
+         ##TODO: DELETE layers in group and not in csv      
 
-            if self.ws and os.path.dirname(lyr.dataSource).endswith('.sde'):
-               ds = os.path.join(self.ws , os.path.basename(lyr.dataSource) )
-            else:
-               ds = lyr.dataSource
-
-            if arcpy.Exists(ds):
-                id = ms.findLayerID( lyr.name )
-                if id >= 0: self.addLyr(ds, lyr.name, id, service, self.groupIDs)
-                else: arcpy.AddWarning("could not find "+ lyr.name +" with mapservice: "+ service )
-            else:
-                arcpy.AddMessage( lyr.name + " has no valid datasource " )
-
-            #generate new token every 50 uses
-            if not nr%50 : self.token = generateToken(self.user, self.password, self.portal)
-        
-        if len(self.groupIDs) and deleteRemaining: #can only savely delete from group.
-            layersRemaining = [i for i in self.existingIDs.keys() if i not in self.LayersFoundinMXD]
-            for lr in layersRemaining:
-               self.delLyr(lr)
-        else:
-            arcpy.AddMessage("no leyers to delete")
-
-    def addLyr(self, dataSource, name, nr, service, groupIDs=[]):
+    def addLyr(self, dataSource, name, serviceUrl, groupIDs=[]):
         """Add *dataSource* to *portal* for *user* , as a item with *name*
-           representing a layer in *service* with id *nr*."""
+           representing a layer in *service* """
         meta = metadata.metadataFromArcgis( dataSource )
         author = meta.credits if len( meta.credits ) else "Stad Antwerpen"
 
-        descrip =  "<strong>"+ meta.title +"</strong>&nbsp;"
-        descrip += "<div><em>" + meta.orgname + "</em></div>&nbsp;" + meta.description 
-        descrip += "\n<br/>&nbsp;Creatiedatum: " + meta.createDate   if meta.createDate else ''
-        descrip += "\n<br/>&nbsp;Publicatiedatum: " + meta.pubDate   if meta.pubDate else ''
-        descrip += "\n<br/>&nbsp;Revisiedatum: " + meta.reviseDate   if meta.reviseDate else ''
-        descrip += "\n<br/>&nbsp;Update frequentie: "+ meta.MaintFreq if meta.MaintFreq else ''
-        descrip += "\n<br/>&nbsp;Beheer: " + meta.contacts           if meta.contacts else ''
-        descrip += "\n<br/>&nbsp;Contact: " + meta.eMails            if meta.eMails else ''
+        descrip = ( "<strong>"+ meta.title +"</strong>&nbsp;<div><em>"+
+                    meta.orgname + "</em></div>&nbsp;" + meta.description +
+                    "\n<br/>&nbsp;Creatiedatum: " + meta.createDate +
+                    "\n<br/>&nbsp;Publicatiedatum: " + meta.pubDate +
+                    "\n<br/>&nbsp;Revisiedatum: " + meta.reviseDate +
+                    "\n<br/>&nbsp;Beheer: " + meta.contacts +
+                    "\n<br/>&nbsp;Contact: " + meta.eMails )
 
         if name in self.existingIDs.keys():
             self.LayersFoundinMXD.append(name)
             arcpy.AddMessage( "updating " + name )
-            item = updateItem(self.user, self.token, self.portal, self.existingIDs[name], service + str(nr),
+            item = updateItem(self.user, self.token, self.portal, self.existingIDs[name], serviceUrl,
                   title=name, summary=meta.purpose, description=descrip, author=author, tags=",".join(meta.tags))
         else:
             arcpy.AddMessage( "adding " + name )
-            item = additem(self.user, self.token, self.portal, service + str(nr),
+            item = additem(self.user, self.token, self.portal, serviceUrl,
                  title=name, summary=meta.purpose, description=descrip, author=author, tags=",".join(meta.tags) )
 
         if "success" in item.keys() and item["success"]:
             id = item["id"]
             arcpy.AddMessage( shareItem(id, self.token, self.portal, True, True, groupIDs) )
+        elif "success" in item.keys() and not item["success"]:
+            raise Exception( "Error uploading "+ name +" "+ json.dumps(result))
         else:
-            raise Exception( "Error uploading "+ name +" : "+ str(item) )
+            arcpy.AddMessage("unsure of success for layer "+ name +" "+ json.dumps(result)) 
       
     def delLyr(self, name):
         if name in self.existingIDs.keys():

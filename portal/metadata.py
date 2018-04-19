@@ -3,6 +3,8 @@ import os, tempfile
 
 
 class metadata (object):
+
+
     __updateFreqCL = {
     '001':	'continual',
     '002':	'daily',
@@ -102,7 +104,7 @@ class metadata (object):
         else: self.reviseDate = ''
 
         upDateNode = root.find(".//resMaint/maintFreq/MaintFreqCd")
-        if upDateNode <> None and 'value' in upDateNode.attrib:
+        if upDateNode <> None and 'value' in upDateNode.attrib and upDateNode.attrib['value'] in self.__updateFreqCL:
             self.MaintFreq = self.__updateFreqCL[ upDateNode.attrib['value'] ]
         else:
             self.MaintFreq = ''
