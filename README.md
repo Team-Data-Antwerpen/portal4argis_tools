@@ -21,6 +21,9 @@ So you can run this script daily to update changes in the metadata.
       --user USER           the username of the ESRI argis Portal
       --password PASSWORD   the password of the ESRI argis Portal
       --mxd MXD             the mxd to with sync with the ESRI argis Portal
+      --csv                 the csv to with featurs sync with the ESRI argis Portal, 
+                            The csv has the follwing sturcture: firstline=headers, following lines:  name;path;url
+                            if this argument is added --mxd and --service wil be ignored.
       --service SERVICE     the link to !CORRESPONDING! mapservice of the mxd
       --group GROUP         add all layers to this group
       --ws WS               worskpace a location of a geodatabase that overwrites
